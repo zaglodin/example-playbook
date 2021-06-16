@@ -1,0 +1,20 @@
+node("ansible_docker"){
+    stage("Git checkout"){
+        git credentialsId: 'github-ssh-key', url: 'git@github.com:zaglodin/example-playbook.git'
+    }
+    stage("Check ssh key"){
+        secret_check=true
+    }
+    stage("Run playbook"){
+        if (secret_check){
+                sh "ansible-vault decrypt secret --vault-password-file vault_pass"
+                sh "mkdir -p ~/.ssh/"
+                sh "mv ./secret ~/.ssh/id_rsa"
+                sh "chmod 400 ~/.ssh/id_rsa"
+        }
+        else{
+            echo 'no more keys'
+        }
+        
+    }
+}
